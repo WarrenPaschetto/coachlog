@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,15 @@ async function createClientAction(formData: FormData) {
     redirect("/dashboard");
 }
 
-export default async function NewClientPage() {
+export default function NewClientPage() {
+    return (
+        <Suspense fallback={<NewClientLoading />}>
+            <NewClientContent />
+        </Suspense>
+    );
+}
+
+async function NewClientContent() {
     const supabase = await createClient();
 
     const {
@@ -128,6 +137,20 @@ export default async function NewClientPage() {
                     </Button>
                 </div>
             </form>
+        </main>
+    );
+}
+
+function NewClientLoading() {
+    return (
+        <main className="mx-auto max-w-2xl p-6">
+            <div className="h-8 w-48 rounded bg-muted" />
+            <div className="mt-3 h-4 w-96 rounded bg-muted" />
+            <div className="mt-8 space-y-4">
+                <div className="h-10 rounded bg-muted" />
+                <div className="h-10 rounded bg-muted" />
+                <div className="h-24 rounded bg-muted" />
+            </div>
         </main>
     );
 }

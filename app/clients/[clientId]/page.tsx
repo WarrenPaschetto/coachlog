@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -10,7 +11,15 @@ type ClientPageProps = {
     }>;
 };
 
-export default async function ClientPage({ params }: ClientPageProps) {
+export default function ClientPage({ params }: ClientPageProps) {
+    return (
+        <Suspense fallback={<ClientPageLoading />}>
+            <ClientPageContent params={params} />
+        </Suspense>
+    );
+}
+
+async function ClientPageContent({ params }: ClientPageProps) {
     const { clientId } = await params;
 
     const supabase = await createClient();
@@ -40,9 +49,11 @@ export default async function ClientPage({ params }: ClientPageProps) {
                     <Link href="/dashboard" className="text-sm text-muted-foreground">
                         ← Back to dashboard
                     </Link>
+
                     <h1 className="mt-2 text-3xl font-bold">
                         {client.first_name} {client.last_name}
                     </h1>
+
                     <p className="text-muted-foreground">Client profile</p>
                 </div>
 
@@ -86,6 +97,24 @@ export default async function ClientPage({ params }: ClientPageProps) {
                         </p>
                     </CardContent>
                 </Card>
+            </div>
+        </main>
+    );
+}
+
+function ClientPageLoading() {
+    return (
+        <main className="mx-auto max-w-4xl p-6">
+            <div className="mb-8">
+                <div className="h-4 w-32 rounded bg-muted" />
+                <div className="mt-4 h-8 w-64 rounded bg-muted" />
+                <div className="mt-3 h-4 w-40 rounded bg-muted" />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+                <div className="h-40 rounded-lg border bg-card" />
+                <div className="h-40 rounded-lg border bg-card" />
+                <div className="h-40 rounded-lg border bg-card md:col-span-2" />
             </div>
         </main>
     );
